@@ -254,8 +254,8 @@
 
 <script>
 // === STATE ===
-let items = JSON.parse(localStorage.getItem('cardTracker') || '[]');
-let nextRef = parseInt(localStorage.getItem('cardTrackerRef') || '1');
+let items = JSON.parse(localStorage.getItem('cardTracker') || '[{"ref":1,"date":"2026-09-19","name":"One Piece Day 26","type":"Raw","units":39,"cost":3140,"current":null}]');
+let nextRef = parseInt(localStorage.getItem('cardTrackerRef') || '2');
 
 // === SAVE ===
 function save() {
