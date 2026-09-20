@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Expense Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 700; }
+        .header p { font-size: 0.85rem; color: #888; margin-top: 0.2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+
+        /* Summary Cards */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+        .summary-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #2a2a4a;
+        }
+        .summary-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-card .value { font-size: 1.4rem; font-weight: 700; margin-top: 0.3rem; }
+        .value.green { color: #4caf50; }
+        .value.red { color: #ef5350; }
+        .value.blue { color: #42a5f5; }
+        .value.orange { color: #ff9800; }
+
+        /* Add Form */
+        .form-section {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border: 1px solid #2a2a4a;
+        }
+        .form-section h2 { font-size: 1rem; margin-bottom: 1rem; color: #4fc3f7; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 0.3rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.6rem;
+            background: #0f0f1a;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #4fc3f7; color: #0f0f1a; }
+        .btn-primary:hover { background: #29b6f6; }
+        .btn-danger { background: #ef5350; color: white; }
+        .btn-danger:hover { background: #e53935; }
+        .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+        /* Table */
+        .table-container {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2a4a;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th {
+            background: #16213e;
+            padding: 0.8rem 0.6rem;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        td {
+            padding: 0.7rem 0.6rem;
+            border-bottom: 1px solid #1e1e30;
+            font-size: 0.85rem;
+        }
+        tr:hover { background: #1e1e35; }
+        .ref { color: #4fc3f7; font-weight: 600; }
+        .item-name { font-weight: 500; color: #e0e0e0; }
+        .type-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .type-raw { background: #2e7d32; color: white; }
+        .type-booster { background: #e65100; color: white; }
+        .type-psa { background: #1565c0; color: white; }
+        .profit { color: #4caf50; font-weight: 600; }
+        .loss { color: #ef5350; font-weight: 600; }
+        .neutral { color: #888; }
+        .actions { display: flex; gap: 0.3rem; }
+        .current-input {
+            width: 80px;
+            padding: 0.3rem;
+            background: #0f0f1a;
+            border: 1px solid #2a2a4a;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 0.8rem;
+        }
+        .current-input:focus { outline: none; border-color: #4fc3f7; }
+
+        .empty-state { text-align: center; padding: 3rem; color: #555; }
+        .footer-note {
+            text-align: center;
+            color: #444;
+            font-size: 0.75rem;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .summary { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🃏 Card Expense Tracker</h1>
+    <p>Track purchases, costs, and profit/loss</p>
+</div>
+
+<div class="container">
+
+    <!-- Summary -->
+    <div class="summary" id="summary">
+        <div class="summary-card">
+            <div class="label">Total Invested</div>
+            <div class="value blue" id="total-invested">$0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Current Value</div>
+            <div class="value orange" id="total-current">$0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total P/L</div>
+            <div class="value" id="total-pl">$0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Items Tracked</div>
+            <div class="value" id="total-items">0</div>
+        </div>
+    </div>
+
+    <!-- Add Form -->
+    <div class="form-section">
+        <h2>➕ Add Purchase</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Date Purchased</label>
+                <input type="date" id="f-date">
+            </div>
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text" id="f-name" placeholder="e.g. Luffy SP Raw">
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="f-type">
+                    <option value="Raw">Raw Card</option>
+                    <option value="Booster Box">Booster Box</option>
+                    <option value="PSA">PSA Graded</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>No. of Units</label>
+                <input type="number" id="f-units" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>Total Cost ($)</label>
+                <input type="number" id="f-cost" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Current/Sell Price ($)</label>
+                <input type="number" id="f-current" placeholder="Optional" step="0.01">
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button class="btn btn-primary" onclick="addItem()">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Units</th>
+                    <th>Total Cost</th>
+                    <th>Cost/Unit</th>
+                    <th>Current Price</th>
+                    <th>P/L</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr class="empty-state">
+                    <td colspan="10">No items yet — add your first purchase above</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">Data saved locally in browser · Export/Import via JSON</div>
+</div>
+
+<script>
+// === STATE ===
+let items = JSON.parse(localStorage.getItem('cardTracker') || '[]');
+let nextRef = parseInt(localStorage.getItem('cardTrackerRef') || '1');
+
+// === SAVE ===
+function save() {
+    localStorage.setItem('cardTracker', JSON.stringify(items));
+    localStorage.setItem('cardTrackerRef', nextRef.toString());
+}
+
+// === FORMAT ===
+function fmt(n) {
+    if (n === '' || n === null || n === undefined) return '—';
+    return '$' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+// === RENDER ===
+function render() {
+    const tbody = document.getElementById('table-body');
+    
+    if (items.length === 0) {
+        tbody.innerHTML = '<tr class="empty-state"><td colspan="10">No items yet — add your first purchase above</td></tr>';
+    } else {
+        tbody.innerHTML = items.map(item => {
+            const costPerUnit = item.units > 0 ? (item.cost / item.units) : 0;
+            let plHtml = '<span class="neutral">—</span>';
+            
+            if (item.current && item.current > 0) {
+                const totalCurrent = item.current * item.units;
+                const pl = totalCurrent - item.cost;
+                const plClass = pl > 0 ? 'profit' : pl < 0 ? 'loss' : 'neutral';
+                const plSign = pl > 0 ? '+' : '';
+                plHtml = `<span class="${plClass}">${plSign}${fmt(pl)}</span>`;
+            }
+            
+            const typeClass = item.type === 'Raw' ? 'type-raw' : item.type === 'Booster Box' ? 'type-booster' : 'type-psa';
+            
+            return `
+                <tr>
+                    <td class="ref">${item.ref}</td>
+                    <td>${item.date}</td>
+                    <td class="item-name">${item.name}</td>
+                    <td><span class="type-badge ${typeClass}">${item.type}</span></td>
+                    <td>${item.units}</td>
+                    <td>${fmt(item.cost)}</td>
+                    <td>${fmt(costPerUnit)}</td>
+                    <td>
+                        <input type="number" class="current-input" value="${item.current || ''}" 
+                            placeholder="—" step="0.01"
+                            onchange="updateCurrent(${item.ref}, this.value)">
+                    </td>
+                    <td>${plHtml}</td>
+                    <td class="actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.ref})">✕</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // Summary
+    const totalInvested = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+    const totalCurrent = items.reduce((s, i) => s + (i.current ? parseFloat(i.current) * i.units : 0), 0);
+    const totalPL = totalCurrent - totalInvested;
+    
+    document.getElementById('total-invested').textContent = fmt(totalInvested);
+    document.getElementById('total-current').textContent = fmt(totalCurrent);
+    
+    const plEl = document.getElementById('total-pl');
+    plEl.textContent = (totalPL > 0 ? '+' : '') + fmt(totalPL);
+    plEl.className = 'value ' + (totalPL > 0 ? 'green' : totalPL < 0 ? 'red' : '');
+    
+    document.getElementById('total-items').textContent = items.length;
+}
+
+// === ACTIONS ===
+function addItem() {
+    const date = document.getElementById('f-date').value;
+    const name = document.getElementById('f-name').value.trim();
+    const type = document.getElementById('f-type').value;
+    const units = parseInt(document.getElementById('f-units').value) || 1;
+    const cost = parseFloat(document.getElementById('f-cost').value) || 0;
+    const current = parseFloat(document.getElementById('f-current').value) || null;
+    
+    if (!name || !date || cost <= 0) {
+        alert('Please fill in Date, Item Name, and Total Cost');
+        return;
+    }
+    
+    items.push({
+        ref: nextRef++,
+        date, name, type, units, cost, current
+    });
+    
+    save();
+    render();
+    
+    // Clear form
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-cost').value = '';
+    document.getElementById('f-current').value = '';
+    document.getElementById('f-units').value = '1';
+}
+
+function updateCurrent(ref, value) {
+    const item = items.find(i => i.ref === ref);
+    if (item) {
+        item.current = parseFloat(value) || null;
+        save();
+        render();
+    }
+}
+
+function deleteItem(ref) {
+    if (!confirm('Delete item #' + ref + '?')) return;
+    items = items.filter(i => i.ref !== ref);
+    save();
+    render();
+}
+
+// === INIT ===
+document.getElementById('f-date').valueAsDate = new Date();
+render();
+</script>
+
+</body>
+</html>
