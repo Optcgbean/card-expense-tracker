@@ -211,11 +211,11 @@
                 <input type="number" id="f-units" value="1" min="1">
             </div>
             <div class="form-group">
-                <label>Total Cost ($)</label>
+                <label>Total Cost (HK$)</label>
                 <input type="number" id="f-cost" placeholder="0.00" step="0.01">
             </div>
             <div class="form-group">
-                <label>Current/Sell Price ($)</label>
+                <label>Current/Sell Price (HK$)</label>
                 <input type="number" id="f-current" placeholder="Optional" step="0.01">
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;">
@@ -254,7 +254,7 @@
 
 <script>
 // === STATE ===
-let items = JSON.parse(localStorage.getItem('cardTracker') || '[{"ref":1,"date":"2026-09-19","name":"One Piece Day 26","type":"Raw","units":39,"cost":3140,"current":null},{"ref":2,"date":"2026-09-19","name":"OP17 English Booster Box","type":"Booster Box","units":2,"cost":2400,"current":null},{"ref":3,"date":"2026-06-25","name":"OPCG China 3rd Anniversary Set","type":"Raw","units":1,"cost":76.92,"current":null},{"ref":4,"date":"2026-06-25","name":"Gundam Card Game 1st Anniversary Set","type":"Raw","units":1,"cost":102.56,"current":null}]');
+let items = JSON.parse(localStorage.getItem('cardTracker') || '[{"ref":1,"date":"2026-09-19","name":"One Piece Day 26","type":"Raw","units":39,"cost":24492,"current":null},{"ref":2,"date":"2026-09-19","name":"OP17 English Booster Box","type":"Booster Box","units":2,"cost":18720,"current":null},{"ref":3,"date":"2026-06-25","name":"OPCG China 3rd Anniversary Set","type":"Raw","units":1,"cost":600,"current":null},{"ref":4,"date":"2026-06-25","name":"Gundam Card Game 1st Anniversary Set","type":"Raw","units":1,"cost":800,"current":null}]');
 let nextRef = parseInt(localStorage.getItem('cardTrackerRef') || '5');
 
 // === SAVE ===
@@ -266,7 +266,7 @@ function save() {
 // === FORMAT ===
 function fmt(n) {
     if (n === '' || n === null || n === undefined) return '—';
-    return '$' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    return 'HK$' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
 
 // === RENDER ===
